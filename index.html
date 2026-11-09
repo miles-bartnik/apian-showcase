@@ -45,6 +45,15 @@
   .btn.ghost { border: 1px solid var(--line); color: var(--ink); }
   .btn.ghost:hover { border-color: var(--teal); text-decoration: none; }
 
+  /* hero banner */
+  .banner { margin-top: 44px; border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--line); position: relative; }
+  .banner img { width: 100%; display: block; }
+  .banner .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px;
+    background: linear-gradient(180deg, transparent, rgba(11,18,32,.85)); color: var(--dim);
+    font-size: .85rem; }
+  .banner .cap b { color: var(--ink); }
+
   /* stats */
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 14px; margin: 48px 0 8px; }
@@ -107,7 +116,8 @@
     <span class="brand">APIAN TERRAIN</span>
     <div class="links">
       <a href="#features">Features</a>
-      <a href="#gallery">Gallery</a>
+      <a href="#gallery">Product</a>
+      <a href="#renders">Renders</a>
       <a href="#pipeline">How it works</a>
       <a href="https://github.com/miles-bartnik/apian-terrain">GitHub</a>
       <a href="https://milescape0626.gumroad.com/l/apian_terrain">Get it</a>
@@ -126,6 +136,10 @@
     <div class="cta-row">
       <a class="btn primary" href="https://milescape0626.gumroad.com/l/apian_terrain">Get Apian Terrain on Gumroad</a>
       <a class="btn ghost" href="https://github.com/miles-bartnik/apian-terrain">Source on GitHub</a>
+    </div>
+    <div class="banner">
+      <img src="img/showcase/hero-monaco-sunrise.jpg" alt="Monaco at sunrise — terrain, water and city lights rendered from an Apian dataset">
+      <div class="cap"><b>Monaco at sunrise</b> — terrain, simulated water and structure lights, rendered straight from an Apian dataset in Blender</div>
     </div>
     <div class="stats">
       <div class="stat"><b>1,000,000</b><span>H3 cells per region, ~25 derived parameters each</span></div>
@@ -163,8 +177,8 @@
     <h2>The product</h2>
     <p class="sub">The C#/.NET WPF Manager builds the dataset; the Blender add-on turns it into a scene.</p>
     <div class="gallery">
-      <figure class="shot"><img src="img/showcase/manager-globe.jpg" alt="Apian Manager landing page">
-        <figcaption><b>Apian Manager</b> — landing page with recent manifests and globe-region picker</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/manager-landing.jpg" alt="Apian Manager landing page with region list">
+        <figcaption><b>Apian Manager</b> — landing page with recent regions, cell counts and resolutions</figcaption></figure>
       <figure class="shot"><img src="img/showcase/manager-terrain.jpg" alt="Terrain layer in the Manager">
         <figcaption><b>Region builder</b> — terrain, bathymetry and coastline staged for export</figcaption></figure>
       <figure class="shot"><img src="img/showcase/manager-water.jpg" alt="Water simulation in the Manager">
@@ -175,6 +189,22 @@
         <figcaption><b>Blender 5.2</b> — an imported harbour region: terrain, water, streets, structures</figcaption></figure>
       <figure class="shot"><img src="img/showcase/vegetation-masters.jpg" alt="Procedurally baked vegetation masters">
         <figcaption><b>Vegetation masters</b> — procedurally grown Norfolk Island Pines, per-species collections</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="renders">
+  <div class="wrap">
+    <h2>Rendered regions</h2>
+    <p class="sub">Every image below is a Blender render of a real region built by the pipeline —
+    no hand-modelling, no stock assets.</p>
+    <div class="gallery">
+      <figure class="shot"><img src="img/showcase/render-guanabara-dusk.jpg" alt="Guanabara Bay at dusk with contour shorelines">
+        <figcaption><b>Guanabara Bay, Rio de Janeiro</b> — dusk render with surface contours tracing the shoreline</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/render-manhattan-night.jpg" alt="Manhattan at night rendered as voxel structures">
+        <figcaption><b>Manhattan, New York</b> — OSM structures rendered at night, ~820k cells</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/render-sydney-trees.jpg" alt="Sydney tree canopy data visualised in 3D">
+        <figcaption><b>Sydney tree canopy</b> — city tree data fused onto the hex grid</figcaption></figure>
     </div>
   </div>
 </section>
