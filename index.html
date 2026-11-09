@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apian Terrain — Geospatial Data Management &amp; 3D Visualization</title>
+<meta name="description" content="Apian Terrain fuses elevation, bathymetry, water, vegetation, structures and streets onto an H3 hex grid and imports them into Blender as a complete 3D scene — one pipeline, one click.">
+<style>
+  :root {
+    --bg: #0b1220; --bg2: #0f1a2e; --panel: #13203a; --line: #22344f;
+    --ink: #e8eef7; --dim: #9fb0c7; --teal: #2dd4bf; --teal-dim: #14b8a6;
+    --gold: #d4a53c; --radius: 14px;
+    --font: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); line-height: 1.6; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+        background: rgba(11,18,32,.82); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; gap: 22px; height: 58px; }
+  nav img { height: 30px; width: 30px; border-radius: 7px; }
+  nav .brand { font-weight: 700; letter-spacing: .04em; color: var(--ink); }
+  nav .links { margin-left: auto; display: flex; gap: 20px; font-size: .92rem; }
+  nav .links a { color: var(--dim); }
+  nav .links a:hover { color: var(--teal); text-decoration: none; }
+
+  /* hero */
+  header.hero { padding: 88px 0 64px;
+    background: radial-gradient(1000px 480px at 70% -10%, rgba(45,212,191,.14), transparent 60%),
+                radial-gradient(800px 400px at 10% 110%, rgba(212,165,60,.08), transparent 60%); }
+  .hero .kicker { color: var(--teal); font-weight: 600; letter-spacing: .18em;
+    text-transform: uppercase; font-size: .8rem; }
+  .hero h1 { font-size: clamp(2.1rem, 4.6vw, 3.4rem); line-height: 1.12; margin: 14px 0 18px; }
+  .hero h1 em { font-style: normal; color: var(--teal); }
+  .hero p.lede { max-width: 720px; color: var(--dim); font-size: 1.12rem; }
+  .cta-row { margin-top: 30px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 13px 26px; border-radius: 10px; font-weight: 600; }
+  .btn.primary { background: var(--teal); color: #06251f; }
+  .btn.primary:hover { background: #5eead4; text-decoration: none; }
+  .btn.ghost { border: 1px solid var(--line); color: var(--ink); }
+  .btn.ghost:hover { border-color: var(--teal); text-decoration: none; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin: 48px 0 8px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; }
+  .stat b { display: block; font-size: 1.5rem; color: var(--teal); }
+  .stat span { color: var(--dim); font-size: .9rem; }
+
+  section { padding: 64px 0; }
+  h2 { font-size: 1.7rem; margin-bottom: 8px; }
+  .sub { color: var(--dim); max-width: 720px; margin-bottom: 34px; }
+
+  /* features */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px; transition: border-color .15s ease, transform .15s ease; }
+  .card:hover { border-color: var(--teal-dim); transform: translateY(-2px); }
+  .card h3 { font-size: 1.08rem; margin: 12px 0 8px; }
+  .card p { color: var(--dim); font-size: .94rem; }
+  .card .ico { width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center;
+    background: rgba(45,212,191,.12); color: var(--teal); font-size: 1.15rem; font-weight: 700; }
+
+  /* gallery */
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+  .shot { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; }
+  .shot img { width: 100%; display: block; }
+  .shot figcaption { padding: 12px 16px; color: var(--dim); font-size: .88rem; }
+  .shot figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* pipeline */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;
+    counter-reset: step; }
+  .step { position: relative; background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px; }
+  .step::before { counter-increment: step; content: counter(step);
+    display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--teal); color: #06251f; font-weight: 700; margin-bottom: 14px; }
+  .step h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .step p { color: var(--dim); font-size: .92rem; }
+
+  /* tech */
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge { border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px;
+    color: var(--dim); font-size: .88rem; background: var(--bg2); }
+
+  /* cta + footer */
+  .final { text-align: center; background: linear-gradient(180deg, var(--bg2), var(--bg));
+    border-top: 1px solid var(--line); }
+  .final h2 { font-size: 2rem; }
+  footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--dim); font-size: .85rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <img src="img/showcase/apian-terrain-logo.png" alt="Apian Terrain logo">
+    <span class="brand">APIAN TERRAIN</span>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#pipeline">How it works</a>
+      <a href="https://github.com/miles-bartnik/apian-terrain">GitHub</a>
+      <a href="https://milescape0626.gumroad.com/l/apian_terrain">Get it</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Geospatial pipeline &times; Blender</div>
+    <h1>Real-world terrain, water and vegetation<br>as a <em>complete 3D scene</em> — one pipeline, one click.</h1>
+    <p class="lede">Apian Terrain fuses elevation, bathymetry, coastline, water simulation,
+    procedural vegetation, structures, streets and satellite colour onto an
+    <strong>H3 hex grid</strong>, then imports the whole region into Blender as native
+    geometry. A Windows Manager app drives the entire build — no GIS expertise required.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://milescape0626.gumroad.com/l/apian_terrain">Get Apian Terrain on Gumroad</a>
+      <a class="btn ghost" href="https://github.com/miles-bartnik/apian-terrain">Source on GitHub</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>1,000,000</b><span>H3 cells per region, ~25 derived parameters each</span></div>
+      <div class="stat"><b>14 species</b><span>procedural vegetation masters — gums, pines, shrubs, groundcover</span></div>
+      <div class="stat"><b>Zero-code</b><span>Blender import: install the add-on, press Import</span></div>
+      <div class="stat"><b>End-to-end</b><span>fetch → pipeline → dataset → scene, one desktop app</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Everything a region needs</h2>
+    <p class="sub">Each layer is fetched, processed and fused onto the hex grid independently —
+    import only what you want, re-run any stage, edit anything in between.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">△</div><h3>Terrain &amp; bathymetry</h3>
+        <p>COP30 elevation and GEBCO bathymetry fused at the coastline, with terrain editing baked into the dataset.</p></div>
+      <div class="card"><div class="ico">≈</div><h3>Water simulation</h3>
+        <p>Rivers, lakes and harbours with a baked flow simulation — animated water surfaces and shorelines out of the box.</p></div>
+      <div class="card"><div class="ico">❦</div><h3>Procedural vegetation</h3>
+        <p>Fourteen botanically-parameterised species — whorled conifers, gums, willows, shrubs, groundcover — baked as instanced 3D masters with wind-ready anchors.</p></div>
+      <div class="card"><div class="ico">⌂</div><h3>Structures &amp; streets</h3>
+        <p>OpenStreetMap buildings with generated roofs, bridges, streets and landmark labels — draped on the terrain automatically.</p></div>
+      <div class="card"><div class="ico">⬡</div><h3>H3-native data model</h3>
+        <p>Every layer resolves to the same hex index — query, join and propagate across layers with SQL (DuckDB) and the Manager's Query Engine.</p></div>
+      <div class="card"><div class="ico">◉</div><h3>One-click Blender import</h3>
+        <p>A thin add-on reads the unified dataset straight into geometry nodes — hex-tiled, materialled, and organised into collections.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="wrap">
+    <h2>The product</h2>
+    <p class="sub">The C#/.NET WPF Manager builds the dataset; the Blender add-on turns it into a scene.</p>
+    <div class="gallery">
+      <figure class="shot"><img src="img/showcase/manager-globe.jpg" alt="Apian Manager landing page">
+        <figcaption><b>Apian Manager</b> — landing page with recent manifests and globe-region picker</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/manager-terrain.jpg" alt="Terrain layer in the Manager">
+        <figcaption><b>Region builder</b> — terrain, bathymetry and coastline staged for export</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/manager-water.jpg" alt="Water simulation in the Manager">
+        <figcaption><b>Water editor</b> — sources, boundaries and flow simulation controls</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/manager-data.jpg" alt="Data Manager query view">
+        <figcaption><b>Data Manager</b> — schema matrix and column queries across every layer</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/blender-viewport.jpg" alt="Imported scene in Blender">
+        <figcaption><b>Blender 5.2</b> — an imported harbour region: terrain, water, streets, structures</figcaption></figure>
+      <figure class="shot"><img src="img/showcase/vegetation-masters.jpg" alt="Procedurally baked vegetation masters">
+        <figcaption><b>Vegetation masters</b> — procedurally grown Norfolk Island Pines, per-species collections</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">Three stages, one dataset, one scene.</p>
+    <div class="steps">
+      <div class="step"><h3>Pick a place</h3>
+        <p>Select any region on the globe in the Manager. Apian fetches elevation, bathymetry, OSM features, imagery and climate data automatically.</p></div>
+      <div class="step"><h3>Build the dataset</h3>
+        <p>The pipeline fuses every layer onto the H3 grid — water flow, procedural species, structures — and writes one compact unified dataset with a manifest.</p></div>
+      <div class="step"><h3>Open in Blender</h3>
+        <p>Install the add-on, point it at the manifest, press Import. Terrain, water, vegetation and city appear as organised, node-driven geometry.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Built with</h2>
+    <p class="sub">A solo-engineered stack, end to end.</p>
+    <div class="badges">
+      <span class="badge">Python</span><span class="badge">C# / .NET / WPF</span>
+      <span class="badge">Blender 5.2 &amp; Geometry Nodes</span><span class="badge">DuckDB</span>
+      <span class="badge">H3 hexagonal indexing</span><span class="badge">GDAL / OGR</span>
+      <span class="badge">PostgreSQL / PostGIS</span><span class="badge">AWS S3 / EC2 / Lambda</span>
+      <span class="badge">Docker</span><span class="badge">CI/CD</span>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Take a region from globe to scene.</h2>
+    <p class="sub" style="margin: 12px auto 28px;">Apian Terrain is available as a paid beta on Gumroad. The pipeline and Blender add-on are open source.</p>
+    <div class="cta-row" style="justify-content: center;">
+      <a class="btn primary" href="https://milescape0626.gumroad.com/l/apian_terrain">Get it on Gumroad</a>
+      <a class="btn ghost" href="https://github.com/miles-bartnik/apian-terrain">Browse the source</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Miles Bartnik — Apian Terrain</span>
+    <span>Pipeline &amp; Blender add-on: GPL-3.0 · Manager app: distributed binary</span>
+  </div>
+</footer>
+
+</body>
+</html>
